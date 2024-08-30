@@ -44,87 +44,79 @@ public class SelectMovie {
 			return;
 		}
 		
-		// 3. 쿼리 준비 및 실행
+		// 3. 쿼리 준비 및 실행		
+		StringBuffer query = new StringBuffer();
+		query.append(" SELECT mi.MV_ID                               ");
+		query.append("  	 , mi.MV_TTL                             ");
+		query.append("  	 , TO_CHAR(MI.OPN, 'YYYY-MM-DD') OPN_DT  "); 
+		query.append("  	 , mi.SCRNG_TM                           ");
+		query.append("  	 , al.AGE_LMT_NM                         ");
+		query.append("  	 , mi.PLT                                ");
+		query.append("  	 , g.GNR_NM                              ");
+		query.append("   FROM MV_INFO mi                             ");
+		query.append("  INNER JOIN MV_GNR mg                         ");
+		query.append("  	ON mi.MV_ID = mg.MV_ID                   ");
+		query.append("  INNER JOIN GNR g                             ");
+		query.append("  	ON mg.GNR_ID = g.GNR_ID                  ");
+		query.append("  INNER JOIN AGE_LMT al                        ");
+		query.append("  	ON mi.AGE_LMT_ID = al.AGE_LMT_ID         ");
 		
-		connection.commit();
-		
-		connection.rollback();
-		
-//		StringBuffer query = new StringBuffer();
-//		query.append(" SELECT mi.MV_ID                               ");
-//		query.append("  	 , mi.MV_TTL                             ");
-//		query.append("  	 , TO_CHAR(MI.OPN, 'YYYY-MM-DD') OPN_DT  "); 
-//		query.append("  	 , mi.SCRNG_TM                           ");
-//		query.append("  	 , al.AGE_LMT_NM                         ");
-//		query.append("  	 , mi.PLT                                ");
-//		query.append("  	 , g.GNR_NM                              ");
-//		query.append("   FROM MV_INFO mi                             ");
-//		query.append("  INNER JOIN MV_GNR mg                         ");
-//		query.append("  	ON mi.MV_ID = mg.MV_ID                   ");
-//		query.append("  INNER JOIN GNR g                             ");
-//		query.append("  	ON mg.GNR_ID = g.GNR_ID                  ");
-//		query.append("  INNER JOIN AGE_LMT al                        ");
-//		query.append("  	ON mi.AGE_LMT_ID = al.AGE_LMT_ID         ");
-//		
-//		PreparedStatement pstmt = null;
-//		ResultSet rs = null;
-//		try {
-//			pstmt = connection.prepareStatement(query.toString());			
-//			// SELECT의 결과를 받아옴
-//			rs = pstmt.executeQuery();
-//		}
-//		catch(SQLException sqle) {
-//			// 쿼리가 잘못된 경우에 실행
-//			System.out.println("쿼리를 실행할 수 없습니다.");
-//			System.out.println(sqle.getMessage());
-//			
-//			if(pstmt != null) {
-//				try {
-//					pstmt.close();					
-//				}
-//				catch(SQLException sqle2) {}
-//			}
-//			
-//			try {
-//				connection.close();				
-//			}
-//			catch(SQLException sqle2) {}
-//			return;
-//		}
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try {
+			pstmt = connection.prepareStatement(query.toString());			
+			// SELECT의 결과를 받아옴
+			rs = pstmt.executeQuery();
+		}
+		catch(SQLException sqle) {
+			// 쿼리가 잘못된 경우에 실행
+			System.out.println("쿼리를 실행할 수 없습니다.");
+			System.out.println(sqle.getMessage());
+			
+			if(pstmt != null) {
+				try {
+					pstmt.close();					
+				}
+				catch(SQLException sqle2) {}
+			}
+			
+			try {
+				connection.close();				
+			}
+			catch(SQLException sqle2) {}
+			return;
+		}
 		
 		// 4. 결과를 출력
-//		try {
-//			while (rs.next()) {
-//				int mvId = rs.getInt("MV_ID");
-//				String mvTtl = rs.getString("MV_TTL");
-//				String opnDt = rs.getString("OPN_DT");
-//				int scrngTm = rs.getInt("SCRNG_TM");
-//				String ageLmtNm = rs.getString("AGE_LMT_NM");
-//				String plt = rs.getString("PLT");
-//				String gnrNm = rs.getString("GNR_NM");
-//				
-//				System.out.println(mvId + " / " + mvTtl + " / " + opnDt + " / " + scrngTm + " / " + ageLmtNm + " / " + plt + " / " + gnrNm + " / ");
-//			}
-//		}
-//		catch(SQLException sqle) {
-//			System.out.println("결과를 가져올 수 없습니다.");
-//			System.out.println(sqle.getMessage());
-//			sqle.printStackTrace();
-//		}
+		try {
+			while (rs.next()) {
+				int mvId = rs.getInt("MV_ID");
+				String mvTtl = rs.getString("MV_TTL");
+				String opnDt = rs.getString("OPN_DT");
+				int scrngTm = rs.getInt("SCRNG_TM");
+				String ageLmtNm = rs.getString("AGE_LMT_NM");
+				String plt = rs.getString("PLT");
+				String gnrNm = rs.getString("GNR_NM");
+				
+				System.out.println(mvId + " / " + mvTtl + " / " + opnDt + " / " + scrngTm + " / " + ageLmtNm + " / " + plt + " / " + gnrNm + " / ");
+			}
+		}
+		catch(SQLException sqle) {
+			System.out.println("결과를 가져올 수 없습니다.");
+			System.out.println(sqle.getMessage());
+			sqle.printStackTrace();
+		}
 			
 		
 		// 5. Oracle Database Session 닫음
 		//	  Session이 안 닫아지면 메모리 누수 문제가 발생
 		//	  메모리 누수가 지속해서 발생할 경우 --> Out of Memory! 예외가 발생하면서 애플리케이션이 종료.
-		try {
-			rs.close();			
+		if(pstmt != null) {
+			try {
+				pstmt.close();
+			}
+			catch(SQLException sqle) {}			
 		}
-		catch(SQLException sqle) {}
-		
-		try {
-			pstmt.close();
-		}
-		catch(SQLException sqle) {}
 		
 		try {
 			connection.close();
